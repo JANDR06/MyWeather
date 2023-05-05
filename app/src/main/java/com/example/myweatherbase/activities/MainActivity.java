@@ -1,8 +1,13 @@
 package com.example.myweatherbase.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myweatherbase.API.Connector;
 import com.example.myweatherbase.R;
@@ -17,44 +22,52 @@ import java.util.Date;
 
 public class MainActivity extends BaseActivity implements CallInterface {
 
-    private TextView txtView ;
-    private TextView textViewDay;
-    private TextView textViewDayOfWeek;
-    private ImageView imageView;
+    private TextView textView;
+    private RecyclerView recyclerView;
     private Root root;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+    }
 
-        txtView = findViewById(R.id.txtView);
-        textViewDay = findViewById(R.id.textViewDay);
-        textViewDayOfWeek = findViewById(R.id.textViewDayOfWeek);
-        txtView = findViewById(R.id.txtView);
-        imageView = findViewById(R.id.imageView);
-
-        // Mostramos la barra de progreso y ejecutamos la llamada a la API
+    @Override
+    protected void onResume() {
+        super.onResume();
         showProgress();
         executeCall(this);
     }
 
-    // Realizamos la llamada y recogemos los datos en un objeto Root
     @Override
     public void doInBackground() {
-        root = Connector.getConector().get(Root.class,"&lat=39.5862518&lon=-0.5411163");
+        root = Connector.getConector().get(Root.class,"&lat=39.454528&lon=-0.350364");
     }
 
-    // Una vez ya se ha realizado la llamada, ocultamos la barra de progreso y presentamos los datos
     @Override
     public void doInUI() {
         hideProgress();
-        txtView.setText(root.list.get(0).weather.get(0).description);
-        ImageDownloader.downloadImage(Parameters.ICON_URL_PRE + root.list.get(0).weather.get(0).icon + Parameters.ICON_URL_POST, imageView);
+        recyclerView = findViewById(R.id.recyclerView);
 
-        Date date = new Date((long)root.list.get(0).dt*1000);
-        SimpleDateFormat dateDayOfWeek = new SimpleDateFormat("E");
-        SimpleDateFormat dateDay = new SimpleDateFormat("EEE, d MMM yyyy HH:mm");
-        textViewDayOfWeek.setText(dateDayOfWeek.format(date));
-        textViewDay.setText(dateDay.format(date));
+        Adaptador miAdaptador = new Adaptador(this, root);
+
+        recyclerView.setAdapter(miAdaptador);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
+
+        textView = findViewById(R.id.textView);
+        textView.setText(root.getCity());
+
+    }
+
+
+    public void onClick(View view) {
+        Intent intent = new Intent(getApplicationContext(),MainActivityDetails.class);
+        int info = recyclerView.getChildAdapterPosition(view);
+        intent.putExtra("numero",info);
+        intent.putExtra("rooti",root);
+        //intent.putExtra("ciudad",ciudad);
+        startActivity(intent);
+        finish();
     }
 }
