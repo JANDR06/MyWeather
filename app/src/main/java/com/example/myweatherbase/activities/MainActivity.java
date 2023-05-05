@@ -59,15 +59,4 @@ public class MainActivity extends BaseActivity implements CallInterface {
         textView.setText(root.getCity());
 
     }
-
-
-    public void onClick(View view) {
-        Intent intent = new Intent(getApplicationContext(),MainActivityDetails.class);
-        int info = recyclerView.getChildAdapterPosition(view);
-        intent.putExtra("numero",info);
-        intent.putExtra("rooti",root);
-        //intent.putExtra("ciudad",ciudad);
-        startActivity(intent);
-        finish();
-    }
 }

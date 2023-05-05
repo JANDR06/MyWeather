@@ -52,9 +52,11 @@ public class Adaptador extends RecyclerView.Adapter<Adaptador.ViewHolder> {
 
          holder.itemView.setOnClickListener(view -> {
             Intent intent = new Intent(view.getContext(), MainActivityDetails.class);
-            //intent.putExtra();
+            intent.putExtra("extra", root);
+             intent.putExtra("numero", position);
             view.getContext().startActivity(intent);
         });
+
     }
 
     @Override
